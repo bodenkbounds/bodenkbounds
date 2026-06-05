@@ -1,0 +1,35 @@
+name: Market Research (8am)
+
+# Scheduled task that performs the market-research portion of the plan.
+# See tasks/market-research.md for the scope this task is expected to cover.
+#
+# Schedule note: GitHub Actions cron always runs in UTC. The cron below is
+# 08:00 UTC. If you want 8am in a specific timezone, adjust the hour field
+# accordingly (e.g. 8am US Eastern = 12/13 UTC depending on DST).
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 08:00 UTC, daily
+  workflow_dispatch: # allow manual runs / testing from the Actions tab
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: market-research
+  cancel-in-progress: false
+
+jobs:
+  market-research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run market research
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt_file: tasks/market-research.md
